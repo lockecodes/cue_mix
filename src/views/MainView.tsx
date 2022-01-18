@@ -1,24 +1,12 @@
 import React from 'react'
-import { Button, Typography } from '@material-ui/core'
-import ValueDisplay from 'components/ValueDisplay'
-import { useStore } from 'services/store'
+import { Typography } from '@material-ui/core'
+import MixSelect from 'components/MixSelect'
 
-const MainView: React.FC = () => {
-  const { value, setValue } = useStore()
-
-  const handleToggleValue = () => {
-    setValue(!value)
-  }
-
+export default function MainView() {
   return (
     <>
-      <Typography variant="h4">Main View</Typography>
-      <ValueDisplay />
-      <Button onClick={handleToggleValue} variant="contained" color="primary">
-        Toggle
-      </Button>
+      <Typography variant="h4">Cue Mix Selection</Typography>
+      <MixSelect />
     </>
   )
 }
-
-export default MainView

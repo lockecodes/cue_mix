@@ -1,8 +1,11 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import { render } from 'react-dom'
 import App from './App'
-import * as serviceWorker from './serviceWorker'
+import React from 'react'
+import { makeServer } from './server'
 
-ReactDOM.render(<App />, document.getElementById('root'))
+if (process.env.NODE_ENV === 'development') {
+  makeServer({ environment: 'development' })
+}
 
-serviceWorker.unregister()
+const rootElement = document.getElementById('root')
+render(<App />, rootElement)
