@@ -6,7 +6,6 @@ import ReaperResponse from '../models/ReaperResponse'
 import Presets from '../models/Presets'
 import Preset from '../models/Preset'
 import axios from 'axios'
-import Send from '../models/Send'
 import TrackElement from '../components/TrackElement'
 import ReceiveElement from '../components/ReceiveElement'
 
@@ -31,11 +30,10 @@ export default function Cue() {
   }
 
   const getCueContent = (theTrack: Track) => {
-    let url = `/_/TRACK;NTRACK;TRACK/${theTrack.trackNumber}/SEND/0`
+    let url = `/_/TRACK;NTRACK;GET/TRACK/${theTrack.trackNumber}/SEND/0`
     for (let i = 1; i <= theTrack.receiveCount; i++) {
-      url += `;TRACK/${params.trackNumber}/SEND/-${i}`
+      url += `;GET/TRACK/${params.trackNumber}/SEND/-${i}`
     }
-    console.log(url)
     return ReaperApiService.get(url).then((response: ReaperResponse) => {
       setReaperResponse(response)
       return response
@@ -61,10 +59,11 @@ export default function Cue() {
     receiveElems.push(<ReceiveElement key={receive.receiveNumber} receive={receive} />)
   })
 
+  console.log(reaperResponse)
   return (
-    <div>
-      <TrackElement volume={reaperResponse?.getTrackByNumber(trackNumber).volume} />
+    <>
+      <TrackElement volume={reaperResponse?.hardwareSend?.volume} trackNumber={trackNumber} />
       {receiveElems}
-    </div>
+    </>
   )
 }

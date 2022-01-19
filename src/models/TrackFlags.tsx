@@ -1,5 +1,6 @@
 /* eslint-disable */
 import ITrackFlags from '../types/TrackFlags'
+
 const FLAG_FOLDER = 'folder'
 const FLAG_SELECTED = 'selected'
 const FLAG_HAS_FX = 'has-fx'

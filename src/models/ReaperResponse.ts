@@ -13,15 +13,15 @@ export default class ReaperResponse implements IReaperResponse {
   public receives: Send[]
 
   constructor(response: { data: string }) {
-    const rows = response.data.split('\n')
+    const rows = response.data.trim().split('\n')
     this.rows = []
     this.tracks = []
     this.receives = []
     this.trackCount = 0
 
     rows.forEach((rowText: string) => {
-      const columnsArray = rowText.split('\t')
-      switch (columnsArray[0]) {
+      const columnsArray = rowText.trim().split('\t')
+      switch (columnsArray[0].trim()) {
         case 'TRACK':
           const track = new Track(columnsArray.slice(1))
           this.rows.push(track)
@@ -43,6 +43,8 @@ export default class ReaperResponse implements IReaperResponse {
           const ntrack = new NTrack(columnsArray[1])
           this.trackCount = ntrack.trackCount
           this.rows.push(ntrack)
+          break
+        case '':
           break
         default:
           console.log('need to add other row types')
