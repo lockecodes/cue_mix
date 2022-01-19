@@ -1,10 +1,6 @@
-import { useRef, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
-export default function useEventListener(
-  eventName: any,
-  handler: ({ clientX, clientY }: { clientX: any; clientY: any }) => void,
-  element: any = window
-) {
+export default function useEventListener(eventName: any, handler: any, element: any = window) {
   // Create a ref that stores handler
   const savedHandler = useRef<any>(null)
   // Update ref.current value if handler changes.

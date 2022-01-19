@@ -1,17 +1,17 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import useEventListener from './UseEventListener'
+import ReaperApiService from '../services/ReaperApi'
+import styled from 'styled-components'
 
-export default function TrackElement(props: any) {
-  const [state, setState] = useState(props)
+export default function TrackElement(props: {
+  volume: number | undefined
+  trackNumber: number | undefined
+}) {
+  const [volume, setVolume] = useState(props.volume)
   const trackRef = useRef<any>(null)
   const thumbRef = useRef<any>(null)
-  // State for storing mouse coordinates
-  const [coords, setCoords] = useState({ x: 0, y: 0 })
-  const [thumbCoords, setThumbCoords] = useState<number | undefined>()
+  let thumbOffset: number
   let mouseDown: boolean = false
-  let volTrackWidth: number = 0
-  let volThumbTrackLEdge: number = 0
-  let volThumbTrackREdge: number = 0
 
   const mouseDownHandler = useCallback(() => {
     mouseDown = true
@@ -25,30 +25,49 @@ export default function TrackElement(props: any) {
     mouseDown = false
   }, [])
 
-  const mouseMoveHandler = useCallback(
-    ({ clientX, clientY, changedTouches }) => {
-      // Update coordinates
-      setCoords({ x: clientX, y: clientY })
-      if (mouseDown) {
-        let volThumbWidth = volTrackWidth * 0.14375
-        let relativeClientX =
-          changedTouches === undefined
-            ? clientX - volThumbWidth
-            : changedTouches[0].clientX - volThumbWidth
-        let relativeCoords = relativeClientX - volThumbTrackLEdge
-        if (relativeCoords < 0) {
-          relativeCoords = 0
-        }
-        if (relativeCoords > volThumbTrackREdge) {
-          relativeCoords = volThumbTrackREdge
-        }
-        setThumbCoords(relativeCoords)
-      }
-    },
-    [setCoords, setThumbCoords]
-  )
+  const calculateOffsets = (pageX: number) => {
+    let volTrackWidth = trackRef?.current.getBoundingClientRect()['width']
+    let volThumbTrackLEdge = trackRef?.current.getBoundingClientRect()['left']
+
+    let volThumbWidth = volTrackWidth * 0.14375
+    let volThumbTrackWidth = volTrackWidth - volThumbWidth
+    let offsetX = pageX - volThumbTrackLEdge - volThumbWidth / 2
+    if (offsetX < 0) {
+      offsetX = 0
+    }
+    if (offsetX > volThumbTrackWidth) {
+      offsetX = volThumbTrackWidth
+    }
+    let offsetX320 = offsetX * (320 / volTrackWidth)
+    let volOutput = offsetX / volThumbTrackWidth
+    let volOutputdB = Math.pow(volOutput, 4) * 4
+    return [offsetX320, volOutputdB]
+  }
+
+  const sendVolumeChange = (vol: number) => {
+    let url = `/_/SET/TRACK/${props.trackNumber}/SEND/0/VOL/${vol.toString()}`
+    ReaperApiService.get(url)
+  }
+
+  const mouseMoveHandler = useCallback((event: MouseEvent) => {
+    // Update coordinates
+    if (mouseDown) {
+      let [offset, vol] = calculateOffsets(event.pageX)
+      setThumbOffset(offset)
+      sendVolumeChange(vol)
+    }
+  }, [])
+
+  const touchMoveHandler = useCallback((event: TouchEvent) => {
+    // Update coordinates
+    if (mouseDown) {
+      let [offset, vol] = calculateOffsets(event.changedTouches[0].pageX)
+      setThumbOffset(offset)
+      sendVolumeChange(vol)
+    }
+  }, [])
   useEventListener('mousemove', mouseMoveHandler, trackRef.current)
-  useEventListener('touchmove', mouseMoveHandler, trackRef.current)
+  useEventListener('touchmove', touchMoveHandler, trackRef.current)
   useEventListener('mouseleave', mouseLeaveHandler, trackRef.current)
   useEventListener('mouseup', mouseUpHandler, trackRef.current)
   useEventListener('touchend', mouseUpHandler, trackRef.current)
@@ -56,26 +75,20 @@ export default function TrackElement(props: any) {
   useEventListener('touchstart', mouseDownHandler, thumbRef.current)
 
   useEffect(() => {
-    if (state !== props.volume) {
-      setState(props.volume)
-    }
-    if (thumbRef && thumbRef.current && trackRef && trackRef.current) {
-      volTrackWidth = parseFloat(thumbRef?.current.getBoundingClientRect()['width'])
-      volThumbTrackLEdge = parseFloat(thumbRef?.current.getBoundingClientRect()['left'])
-      volThumbTrackREdge = parseFloat(thumbRef?.current.getBoundingClientRect()['right'])
-      if (typeof thumbCoords === 'undefined' && props.volume) {
-        setThumbCoords(Math.pow(props.volume || 0, 1 / 4) * 194.68)
-      }
+    if (volume !== props.volume) {
+      setVolume(props.volume)
+      setThumbOffset(Math.pow(props.volume || 0, 1 / 4) * 194.68)
     }
   })
 
-  useEffect(() => {
-    let vteMove = 'translate(' + (thumbCoords || 0).toString() + ' 0)'
+  const setThumbOffset = (offset: number) => {
+    thumbOffset = offset
+    let vteMove = 'translate(' + (offset || 0).toString() + ' 0)'
     thumbRef?.current.setAttributeNS(null, 'transform', vteMove)
-  }, [thumbCoords])
+  }
 
   return (
-    <div ref={trackRef}>
+    <DivWrapper ref={trackRef}>
       <svg
         version="1.1"
         className="faderSvg"
@@ -198,6 +211,10 @@ export default function TrackElement(props: any) {
           />
         </g>
       </svg>
-    </div>
+    </DivWrapper>
   )
 }
+const DivWrapper = styled.div`
+  width: 100%
+  background-color: black;
+`

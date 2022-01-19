@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import ISend from '../types/Send'
 
 export default function ReceiveElement(props: { receive: ISend }) {
