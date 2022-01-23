@@ -10,4 +10,5 @@ export default interface ISend {
   otherTrackIndex: number
   track: Track | undefined
   otherTrack: Track | undefined
+  receiveNumber: number | null
 }
