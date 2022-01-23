@@ -1,47 +1,60 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import useEventListener from './UseEventListener'
+import useEventListener from '../services/UseEventListener'
 import ReaperApiService from '../services/ReaperApi'
 import styled from 'styled-components'
 
-export default function TrackElement(props: {
+export default function TrackFader(props: {
   volume: number | undefined
   trackNumber: number | undefined
 }) {
   const [volume, setVolume] = useState(props.volume)
-  const trackRef = useRef<any>(null)
-  const thumbRef = useRef<any>(null)
-  let thumbOffset: number
-  let mouseDown: boolean = false
+  const [mouseDown, setMouseDown] = useState<boolean>(false)
+  const trackRef = useRef<any>()
+  const thumbRef = useRef<any>()
 
   const mouseDownHandler = useCallback(() => {
-    mouseDown = true
+    setMouseDown(true)
   }, [])
 
   const mouseUpHandler = useCallback(() => {
-    mouseDown = false
+    setMouseDown(false)
   }, [])
 
   const mouseLeaveHandler = useCallback(() => {
-    mouseDown = false
+    setMouseDown(false)
   }, [])
 
-  const mouseMoveHandler = useCallback((event: MouseEvent) => {
-    // Update coordinates
-    if (mouseDown) {
-      let [offset, vol] = calculateOffsets(event.pageX)
-      setThumbOffset(offset)
-      sendVolumeChange(vol)
-    }
-  }, [])
+  const sendVolumeChange = useCallback(
+    (vol: number) => {
+      ReaperApiService.get(`/_/SET/TRACK/${props.trackNumber}/SEND/0/VOL/${vol.toString()}`)
+    },
+    [props.trackNumber]
+  )
 
-  const touchMoveHandler = useCallback((event: TouchEvent) => {
-    // Update coordinates
-    if (mouseDown) {
-      let [offset, vol] = calculateOffsets(event.changedTouches[0].pageX)
-      setThumbOffset(offset)
-      sendVolumeChange(vol)
-    }
-  }, [])
+  const mouseMoveHandler = useCallback(
+    (event: MouseEvent) => {
+      // Update coordinates
+      if (mouseDown) {
+        let [offset, vol] = calculateOffsets(event.pageX)
+        setThumbTranlate(offset)
+        sendVolumeChange(vol)
+      }
+    },
+    [mouseDown, sendVolumeChange]
+  )
+
+  const touchMoveHandler = useCallback(
+    (event: TouchEvent) => {
+      // Update coordinates
+      if (mouseDown) {
+        let [offset, vol] = calculateOffsets(event.changedTouches[0].pageX)
+        setThumbTranlate(offset)
+        sendVolumeChange(vol)
+      }
+    },
+    [mouseDown, sendVolumeChange]
+  )
+
   useEventListener('mousemove', mouseMoveHandler, trackRef.current)
   useEventListener('touchmove', touchMoveHandler, trackRef.current)
   useEventListener('mouseleave', mouseLeaveHandler, trackRef.current)
@@ -69,20 +82,14 @@ export default function TrackElement(props: {
     return [offsetX320, volOutputdB]
   }
 
-  const sendVolumeChange = (vol: number) => {
-    let url = `/_/SET/TRACK/${props.trackNumber}/SEND/0/VOL/${vol.toString()}`
-    ReaperApiService.get(url)
-  }
-
   useEffect(() => {
     if (volume !== props.volume) {
       setVolume(props.volume)
-      setThumbOffset(Math.pow(props.volume || 0, 1 / 4) * 194.68)
+      setThumbTranlate(Math.pow(props.volume || 0, 1 / 4) * 194.68)
     }
-  })
+  }, [volume, props.volume])
 
-  const setThumbOffset = (offset: number) => {
-    thumbOffset = offset
+  const setThumbTranlate = (offset: number) => {
     let vteMove = 'translate(' + (offset || 0).toString() + ' 0)'
     thumbRef?.current.setAttributeNS(null, 'transform', vteMove)
   }
