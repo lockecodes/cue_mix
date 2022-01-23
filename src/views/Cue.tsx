@@ -56,7 +56,16 @@ export default function Cue() {
 
   let receiveElems: ReactElement[] = []
   reaperResponse?.receives.map((receive) => {
-    receiveElems.push(<ReceiveElement key={receive.receiveNumber} receive={receive} />)
+    receiveElems.push(
+      <ReceiveElement
+        key={receive.receiveNumber}
+        volume={receive.volume}
+        trackName={receive.otherTrack?.trackName}
+        trackNumber={trackNumber}
+        receiveNumber={receive.receiveNumber}
+        receiveMuted={receive.flags.muted}
+      />
+    )
   })
 
   console.log(reaperResponse)

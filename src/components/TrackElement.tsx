@@ -25,30 +25,6 @@ export default function TrackElement(props: {
     mouseDown = false
   }, [])
 
-  const calculateOffsets = (pageX: number) => {
-    let volTrackWidth = trackRef?.current.getBoundingClientRect()['width']
-    let volThumbTrackLEdge = trackRef?.current.getBoundingClientRect()['left']
-
-    let volThumbWidth = volTrackWidth * 0.14375
-    let volThumbTrackWidth = volTrackWidth - volThumbWidth
-    let offsetX = pageX - volThumbTrackLEdge - volThumbWidth / 2
-    if (offsetX < 0) {
-      offsetX = 0
-    }
-    if (offsetX > volThumbTrackWidth) {
-      offsetX = volThumbTrackWidth
-    }
-    let offsetX320 = offsetX * (320 / volTrackWidth)
-    let volOutput = offsetX / volThumbTrackWidth
-    let volOutputdB = Math.pow(volOutput, 4) * 4
-    return [offsetX320, volOutputdB]
-  }
-
-  const sendVolumeChange = (vol: number) => {
-    let url = `/_/SET/TRACK/${props.trackNumber}/SEND/0/VOL/${vol.toString()}`
-    ReaperApiService.get(url)
-  }
-
   const mouseMoveHandler = useCallback((event: MouseEvent) => {
     // Update coordinates
     if (mouseDown) {
@@ -73,6 +49,30 @@ export default function TrackElement(props: {
   useEventListener('touchend', mouseUpHandler, trackRef.current)
   useEventListener('mousedown', mouseDownHandler, thumbRef.current)
   useEventListener('touchstart', mouseDownHandler, thumbRef.current)
+
+  const calculateOffsets = (pageX: number) => {
+    let volTrackWidth = trackRef?.current.getBoundingClientRect()['width']
+    let volThumbTrackLEdge = trackRef?.current.getBoundingClientRect()['left']
+
+    let volThumbWidth = volTrackWidth * 0.14375
+    let volThumbTrackWidth = volTrackWidth - volThumbWidth
+    let offsetX = pageX - volThumbTrackLEdge - volThumbWidth / 2
+    if (offsetX < 0) {
+      offsetX = 0
+    }
+    if (offsetX > volThumbTrackWidth) {
+      offsetX = volThumbTrackWidth
+    }
+    let offsetX320 = offsetX * (320 / volTrackWidth)
+    let volOutput = offsetX / volThumbTrackWidth
+    let volOutputdB = Math.pow(volOutput, 4) * 4
+    return [offsetX320, volOutputdB]
+  }
+
+  const sendVolumeChange = (vol: number) => {
+    let url = `/_/SET/TRACK/${props.trackNumber}/SEND/0/VOL/${vol.toString()}`
+    ReaperApiService.get(url)
+  }
 
   useEffect(() => {
     if (volume !== props.volume) {
