@@ -1,16 +1,131 @@
-import React from 'react'
-import ISend from '../types/Send'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import useEventListener from './UseEventListener'
+import ReaperApiService from '../services/ReaperApi'
 
-export default function ReceiveElement(props: { receive: ISend }) {
-  const makeVolumeString = (volume: string) => {
-    let v = parseFloat(volume)
+export default function ReceiveElement(props: {
+  volume: number | undefined
+  trackName: string | undefined
+  trackNumber: number | undefined
+  receiveNumber: number | undefined | null
+  receiveMuted: boolean
+}) {
+  const [volume, setVolume] = useState<any>()
+  const [trackName, setTrackName] = useState<any>()
+  const [volStr, setVolStr] = useState<any>()
+  const [muted, setMuted] = useState<boolean>(props.receiveMuted)
+  const [muteOffVisible, setMuteOffVisible] = useState<string>()
+  const [muteOnVisible, setMuteOnVisible] = useState<string>()
+  const sendRef = useRef<any>(null)
+  const sendLineRef = useRef<any>(null)
+  const sendThumbRef = useRef<any>(null)
+  const sendBgRef = useRef<any>(null)
+  const sendMuteBtnRef = useRef<any>(null)
+  const sendMuteOnRef = useRef<any>(null)
+  const sendMuteOffRef = useRef<any>(null)
+  let thumbOffset: number
+  let mouseDown: boolean = false
+
+  const mouseDownHandler = useCallback(() => {
+    mouseDown = true
+  }, [])
+
+  const mouseUpHandler = useCallback(() => {
+    mouseDown = false
+  }, [])
+
+  const mouseLeaveHandler = useCallback(() => {
+    mouseDown = false
+  }, [])
+
+  const mouseMoveHandler = useCallback((event: MouseEvent) => {
+    // Update coordinates
+    if (mouseDown) {
+      let [offset, vol] = calculateOffsets(event.pageX)
+      setThumbOffset(offset)
+      setVolStr(makeVolumeString(vol))
+      sendVolumeChange(vol)
+    }
+  }, [])
+
+  const touchMoveHandler = useCallback((event: TouchEvent) => {
+    // Update coordinates
+    if (mouseDown) {
+      let [offset, vol] = calculateOffsets(event.changedTouches[0].pageX)
+      setThumbOffset(offset)
+      setVolStr(makeVolumeString(vol))
+      sendVolumeChange(vol)
+    }
+  }, [])
+
+
+  const muteMouseDownHandler = useCallback(() => {
+    setMuted(!muted)
+    let url = `/_/SET/TRACK/${props.trackNumber}/SEND/-${props.receiveNumber}/MUTE/-1`
+    ReaperApiService.get(url)
+  }, [])
+
+  useEventListener('mousemove', mouseMoveHandler, sendRef.current)
+  useEventListener('touchmove', touchMoveHandler, sendRef.current)
+  useEventListener('mouseleave', mouseLeaveHandler, sendRef.current)
+  useEventListener('mouseup', mouseUpHandler, sendRef.current)
+  useEventListener('touchend', mouseUpHandler, sendRef.current)
+  useEventListener('mousedown', mouseDownHandler, sendThumbRef.current)
+  useEventListener('touchstart', mouseDownHandler, sendThumbRef.current)
+  useEventListener('mousedown', muteMouseDownHandler, sendMuteBtnRef.current)
+
+  const calculateOffsets = (pageX: number) => {
+    let sendTrackWidth = sendBgRef?.current.getBoundingClientRect()['width']
+    let sendThumbWidth = sendBgRef?.current.getBoundingClientRect()['height']
+    let sendThumbTrackLEdge = sendBgRef?.current.getBoundingClientRect()['left']
+
+    let sendThumbTrackWidth = (sendTrackWidth - sendThumbWidth)
+    let offsetX = pageX - sendThumbTrackLEdge - (sendThumbWidth / 2)
+    if (offsetX < 0) {
+      offsetX = 0
+    }
+    if (offsetX > sendThumbTrackWidth) {
+      offsetX = sendThumbTrackWidth
+    }
+    let offsetX262 = offsetX * (262 / sendTrackWidth) + 26
+    let sendOutput = (offsetX  / sendThumbTrackWidth)
+    let volsendOutput = Math.pow(sendOutput, 4) * 4
+    return [offsetX262, volsendOutput]
+  }
+
+  const makeVolumeString = (v: number) => {
     if (v < 0.00000002980232) return '-inf dB'
     v = Math.log(v) * 8.68588963806
     return v.toFixed(2) + ' dB'
   }
 
+  const setThumbOffset = (offset: number) => {
+    thumbOffset = offset
+    sendLineRef?.current.setAttributeNS(null, 'x2', offset.toString())
+    sendThumbRef?.current.setAttributeNS(null, 'cx', offset.toString())
+  }
+
+  const sendVolumeChange = (vol: number) => {
+    let url = `/_/SET/TRACK/${props.trackNumber}/SEND/-${props.receiveNumber}/VOL/${vol.toString()}`
+    ReaperApiService.get(url)
+  }
+
+  useEffect(() => {
+    if(volume !== props.volume) {
+      setVolume(props.volume || 0)
+      setThumbOffset((Math.pow(props.volume || 0, 1/4) * 154) + 27)
+      setVolStr(makeVolumeString(props.volume || 0))
+    }
+    if(trackName !== props.trackName) {
+      setTrackName(props.trackName || 'Track Name')
+    }
+    if(muted !== props.receiveMuted) {
+      setMuted(props.receiveMuted)
+    }
+    setMuteOnVisible(muted ? 'visible' : 'hidden')
+    setMuteOffVisible(muted ? 'hidden' : 'visible')
+  })
   return (
-    <div>
+    <div ref={sendRef}>
       <svg
         version="1.1"
         display="block"
@@ -24,13 +139,13 @@ export default function ReceiveElement(props: { receive: ISend }) {
         xmlSpace="preserve"
       >
         <rect className="sendPanelBg" fill="#333333" width="320" height="49" />
-        <path
+        <path ref={sendBgRef}
           className="sendBg"
           fill="#262626"
           d="M244,0c-0.3,0-0.7,0-1,0v0H142h-17H27v0c-0.3,0-0.7,0-1,0C13.8,0,4,9.8,4,22s9.8,22,22,22
             c0.3,0,0.7,0,1,0v0h98h17h101v0c0.3,0,0.7,0,1,0c12.2,0,22-9.8,22-22S256.2,0,244,0z"
         />
-        <line
+        <line ref={sendLineRef}
           className="sendLine"
           pointerEvents="none"
           fill="none"
@@ -52,7 +167,7 @@ export default function ReceiveElement(props: { receive: ISend }) {
           fontFamily="'Open Sans'"
           fontSize="19px"
         >
-          {props.receive.otherTrack?.trackName || 'Track Name'}
+          {trackName}
         </text>
         <text
           className="sDbText"
@@ -63,9 +178,9 @@ export default function ReceiveElement(props: { receive: ISend }) {
           fontFamily="'Open Sans'"
           fontSize="12px"
         >
-          xx dB
+          {volStr}
         </text>
-        <circle
+        <circle ref={sendThumbRef}
           className="sendThumb"
           opacity="0.5"
           fill="#808080"
@@ -77,8 +192,8 @@ export default function ReceiveElement(props: { receive: ISend }) {
           r="19"
         />
 
-        <g className="send_mute button">
-          <g className="send_mute_off" visibility="visible">
+        <g className="send_mute button" ref={sendMuteBtnRef}>
+          <g className="send_mute_off" visibility={muteOffVisible} ref={sendMuteOffRef}>
             <path
               className="shadow"
               opacity="0.15"
@@ -117,7 +232,7 @@ export default function ReceiveElement(props: { receive: ISend }) {
               d="M273.6,43.6c-1.2,0-2.1-1-2.1-2.1v-39 c0-1.2,1-2.1,2.1-2.1h39c1.2,0,2.1,1,2.1,2.1v39c0,1.2-1,2.1-2.1,2.1H273.6z"
             />
           </g>
-          <g className="send_mute_on" visibility="hidden">
+          <g className="send_mute_on" visibility={muteOnVisible} ref={sendMuteOnRef}>
             <path
               display="inline"
               fill="#F13F24"
