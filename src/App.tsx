@@ -4,6 +4,7 @@ import MainView from './views/MainView'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import Cue from './views/Cue'
 import styled from 'styled-components'
+import './App.css'
 
 export default function App() {
   return (
