@@ -33,6 +33,7 @@ def copy_dist():
 
   pathlib.Path(reaper, "index.html").rename(pathlib.Path(reaper,"cue_mix.html"))
   shutil.copytree("src/data", pathlib.Path(reaper, "data"))
+  shutil.copytree("src/images", pathlib.Path(reaper, "images"))
 
 
 def clean_reap():
