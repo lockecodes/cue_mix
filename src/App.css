@@ -3,10 +3,11 @@ body {
 }
 
 .trackSlideContainer {
-  width: 90%; /* Width of the outside container */
   padding: 3em;
   margin: 1em;
   background-color: #333;
+  left: 0;
+  right: 0;
 }
 
 /* The slider itself */
