@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import ReaperApiService from '../services/ReaperApi'
 import Presets from '../models/Presets'
 import axios from 'axios'
-import TrackFader from '../components/TrackFader'
-import ReceiveFader from '../components/ReceiveFader'
-import useInterval from 'services/UseInterval'
+import TrackFader from '../components/TrackFader/TrackFader'
+import ReceiveFader from '../components/ReceiveFader/ReceiveFader'
+import useInterval from '../services/UseInterval'
 
 export default function Cue() {
   const navigate = useNavigate()
@@ -17,7 +17,7 @@ export default function Cue() {
 
   useInterval(() => {
     getCueContent().then()
-  }, 400)
+  }, 1000)
 
   const getCueContent = () => {
     let url = `/_/TRACK;NTRACK;GET/TRACK/${track.trackNumber}/SEND/0`
