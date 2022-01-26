@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import ReaperApiService from '../services/ReaperApi'
+import ReaperApiService from '../../services/ReaperApi'
+import './TrackFader.css'
 
 export default function TrackFader(props: { volume: number; trackNumber: number }) {
   const decimalMax = 3.981072

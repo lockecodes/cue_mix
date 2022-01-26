@@ -1,5 +1,5 @@
 import React from 'react'
-import MixSelect from 'components/MixSelect'
+import MixSelect from 'components/MixSelect/MixSelect'
 
 export default function MainView() {
   return (

@@ -47,7 +47,7 @@ def clean_reap():
 
 
 def build():
-  run("/home/slocke/.nvm/versions/node/v16.13.1/bin/node /home/slocke/.nvm/versions/node/v16.13.1/lib/node_modules/npm/bin/npm-cli.js run build --scripts-prepend-node-path=auto", shell=True, check=True)
+  run("yarn build", shell=True, check=True)
 
 
 try:
