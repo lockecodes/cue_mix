@@ -43,9 +43,6 @@ export default function ReceiveFader(props: { track: ITrack; receive: ISend }) {
   }
 
   const muteMouseDownHandler = useCallback(() => {
-    // let target = e.currentTarget
-    // let src = muted ? muteOff : muteOn
-    // target.setAttribute('src', src)
     ReaperApiService.get(
       `/_/SET/TRACK/${props.track.trackNumber}/SEND/-${props.receive.receiveNumber}/MUTE/-1`
     )
@@ -98,7 +95,11 @@ export default function ReceiveFader(props: { track: ITrack; receive: ISend }) {
         />
       </div>
       <div className="muteContainer">
-        <img src={muted ? muteOn : muteOff} alt="" onClick={(e) => muteMouseDownHandler()} />
+        <img
+          src={muted ? muteOn : muteOff}
+          alt="Mute Button"
+          onClick={() => muteMouseDownHandler()}
+        />
       </div>
     </div>
   )

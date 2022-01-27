@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ReaperApiService from '../services/ReaperApi'
 import Presets from '../models/Presets'
-import axios from 'axios'
 import TrackFader from '../components/TrackFader/TrackFader'
 import ReceiveFader from '../components/ReceiveFader/ReceiveFader'
 import useInterval from '../services/UseInterval'
@@ -13,7 +12,6 @@ export default function Cue() {
   const track = location.state || { trackNumber: null, trackName: null }
   const [hardwareSendVolume, setHardwareSendVolume] = useState()
   const [receiveElems, setReceiveElems] = useState()
-  const [, setPreset] = useState()
 
   useInterval(() => {
     getCueContent().then()
@@ -40,10 +38,7 @@ export default function Cue() {
     if (track.trackNumber === null) {
       navigate('/')
     }
-    axios.get('/data/presets.json').then((res) => {
-      setPreset(new Presets(res.data).getPreset(track.trackName))
-    })
-  }, [navigate, track, track.trackName])
+  }, [navigate, track.trackName])
 
   return (
     <>

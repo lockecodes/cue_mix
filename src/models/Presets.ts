@@ -1,9 +1,11 @@
 import Preset from './Preset'
+import PresetJson from '../data/presets.json'
 
 export default class Presets {
   public readonly presets: Preset[]
 
-  constructor(dataJson: object = {}) {
+  constructor() {
+    let dataJson = PresetJson
     this.presets = []
     for (let [key, value] of Object.entries(dataJson)) {
       let monitorName: string = key
