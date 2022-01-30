@@ -22,6 +22,7 @@ export default function PresetView() {
   }, [preset])
 
   const presetCurrent = useCallback(() => {
+    ReaperApiService.get(`/_/${preset.currentCommand}`)
     ReaperApiService.get(`/_/GET/EXTSTATE/REA_REMOTE_PRESET_BANK/${preset.trackName}`).then(
       (response) => {
         setCurrentPreset(response.externalStates[0].value)
@@ -35,7 +36,7 @@ export default function PresetView() {
   }, [preset])
 
   useInterval(() => {
-    presetCurrent().then()
+    presetCurrent()
   }, 1000)
 
 
