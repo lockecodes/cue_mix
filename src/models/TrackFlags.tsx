@@ -1,6 +1,4 @@
 /* eslint-disable */
-import ITrackFlags from '../types/TrackFlags'
-
 const FLAG_FOLDER = 'folder'
 const FLAG_SELECTED = 'selected'
 const FLAG_HAS_FX = 'has-fx'
@@ -11,7 +9,7 @@ const FLAG_RECORD_ARMED = 'record-armed'
 const FLAG_RECORD_MONITORING_ON = 'record-monitoring-on'
 const FLAG_RECORD_MONITORING_AUTO = 'record-monitoring-auto'
 
-export default class TrackFlags implements ITrackFlags {
+export default class TrackFlags {
   public readonly recordArmed: boolean
   public readonly flags: string[]
   public readonly folder: boolean

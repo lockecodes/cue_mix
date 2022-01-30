@@ -1,6 +1,4 @@
-import INTrack from '../types/NTrack'
-
-export default class NTrack implements INTrack {
+export default class NTrack {
   public _className: string = 'NTrack'
   public trackCount: number
 

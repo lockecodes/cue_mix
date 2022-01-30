@@ -5,6 +5,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom'
 import Cue from './views/Cue'
 import styled from 'styled-components'
 import './App.css'
+import PresetView from './views/PresetView'
 
 export default function App() {
   return (
@@ -14,8 +15,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<MainView />} />
             <Route path="cue" element={<Cue />}>
-              <Route path=":trackNumber" element={<Cue />} />
+              <Route path=":trackNumber" element={<Cue />}/>
             </Route>
+            <Route path="presets" element={<PresetView />}/>
           </Routes>
         </HashRouter>
       </ViewWrapper>

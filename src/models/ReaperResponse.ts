@@ -1,22 +1,24 @@
 import Track from './Track'
 import NTrack from './NTrack'
-import IReaperResponse from '../types/ReaperResponse'
 import Send from './Send'
+import ExtState from './ExtState'
+import Preset from './Preset'
 
-export default class ReaperResponse implements IReaperResponse {
+export default class ReaperResponse {
   public trackCount: number
-  public rows: (Track | NTrack | Send)[]
   public tracks: Track[]
   public armedTracks: Track[]
   public monitorTracks: Track[]
   public hardwareSend: Send | undefined
   public receives: Send[]
+  public externalStates: ExtState[]
+  public presets: { [trackName: string]: Preset } = {}
 
   constructor(response: { data: string }) {
     const rows = response.data.trim().split('\n')
-    this.rows = []
     this.tracks = []
     this.receives = []
+    this.externalStates = []
     this.trackCount = 0
 
     rows.forEach((rowText: string) => {
@@ -24,12 +26,10 @@ export default class ReaperResponse implements IReaperResponse {
       switch (columnsArray[0].trim()) {
         case 'TRACK':
           const track = new Track(columnsArray.slice(1))
-          this.rows.push(track)
           this.tracks.push(track)
           break
         case 'SEND':
           const send = new Send(columnsArray.slice(1))
-          this.rows.push(send)
           if (send.isHardwareOutput) {
             this.hardwareSend = send
             break
@@ -42,13 +42,32 @@ export default class ReaperResponse implements IReaperResponse {
         case 'NTRACK':
           const ntrack = new NTrack(columnsArray[1])
           this.trackCount = ntrack.trackCount
-          this.rows.push(ntrack)
+          break
+        case 'EXTSTATE':
+          const externalState = new ExtState(columnsArray.slice(1))
+          this.externalStates.push(externalState)
+          if (Object.keys(externalState.presets).length > 0) {
+            this.presets = externalState.presets
+          }
           break
         case '':
           break
         default:
           console.log('need to add other row types')
       }
+    })
+
+    this.tracks.forEach((track: Track) => {
+      this.externalStates.forEach((externalState: ExtState) => {
+        if(externalState.isCommandMap()) {
+          track.preset = externalState.presets[track.trackName]
+        }
+      })
+      this.externalStates.forEach((externalState: ExtState) => {
+        if(externalState.isPresetBankValueForTrack(track.monitoredTrackName) && track.preset) {
+          track.preset.currentPresetName = externalState.value
+        }
+      })
     })
 
     this.armedTracks = this.tracks.filter((armedTrack: Track) => {

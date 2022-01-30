@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import ReaperApiService from '../../services/ReaperApi'
-import ITrack from 'types/Track'
-import ISend from 'types/Send'
 import muteOn from 'images/muteOn.png'
 import muteOff from 'images/muteOff.png'
 import './ReceiveFader.css'
+import Track from '../../models/Track'
+import Send from '../../models/Send'
 
-export default function ReceiveFader(props: { track: ITrack; receive: ISend }) {
+export default function ReceiveFader(props: { track: Track; receive: Send }) {
   const decimalMax = 3.981072
   const inputMin = 0
   const inputMax = 3.981072

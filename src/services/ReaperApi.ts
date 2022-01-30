@@ -1,10 +1,9 @@
 import axios, { AxiosResponse } from 'axios'
-import IReaperResponse from '../types/ReaperResponse'
 import ReaperResponse from '../models/ReaperResponse'
 
 async function get(url: string) {
   return await axios
-    .get<IReaperResponse, AxiosResponse>(url)
+    .get<ReaperResponse, AxiosResponse>(url)
     .then((response) => {
       return new ReaperResponse(response)
     })

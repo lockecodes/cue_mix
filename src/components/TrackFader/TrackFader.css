@@ -4,6 +4,7 @@
   background-color: #333;
   left: 0;
   right: 0;
+  clear: both;
 }
 
 /* The slider itself */

@@ -1,7 +1,7 @@
 div.receiveContainer {
   display: block;
-  clear: right;
-  min-width: 680px;
+  clear: both;
+  min-width: 750px;
 }
 
 div.receiveSliderContainer {

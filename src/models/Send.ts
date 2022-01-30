@@ -1,12 +1,10 @@
-import ISend from '../types/Send'
-import ISendFlags from '../types/SendFlags'
 import SendFlags from './SendFlags'
 import Track from './Track'
 
-export default class Send implements ISend {
+export default class Send {
   public readonly trackNumber: number
   public readonly sendNumber: number
-  public readonly flags: ISendFlags
+  public readonly flags: SendFlags
   public readonly volume: number
   public readonly pan: number
   public readonly otherTrackIndex: number

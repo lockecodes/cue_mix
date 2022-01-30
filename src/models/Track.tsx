@@ -1,11 +1,10 @@
-import ITrack from '../types/Track'
-import ITrackFlags from '../types/TrackFlags'
 import TrackFlags from './TrackFlags'
+import Preset from './Preset'
 
-export default class Track implements ITrack {
+export default class Track {
   public readonly trackNumber: number
   public readonly trackName: string
-  public readonly trackFlags: ITrackFlags
+  public readonly trackFlags: TrackFlags
   public volume: number
   public pan: number
   public lastMeterPeak: number
@@ -16,6 +15,8 @@ export default class Track implements ITrack {
   public readonly receiveCount: number
   public readonly hardwareOutCount: number
   public readonly color: number
+  public preset: Preset = new Preset("", "", "", "")
+  public readonly monitoredTrackName: string = ""
 
   public constructor(args: Array<string>) {
     let [
@@ -46,6 +47,7 @@ export default class Track implements ITrack {
     this.receiveCount = parseInt(recvCnt, 10)
     this.hardwareOutCount = parseInt(hwoutCnt, 10)
     this.color = parseInt(color, 10)
+    this.monitoredTrackName = this.isMonitor ? trackName.replace(' Monitor', '') : ''
   }
 
   get isMaster() {
