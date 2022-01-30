@@ -1,61 +1,49 @@
+import os
 import shutil
-import pathlib
+from pathlib import Path
 from subprocess import run
 
-
-def get_dist():
-  return pathlib.Path("build")
-
-
-def get_reap():
-  return pathlib.Path("/home/slocke/.config/REAPER/reaper_www_root")
+REAPER_ROOT = Path(os.getenv("REAPER_ROOT", "~/.config/REAPER/reaper_www_root"))
+BUILD_PATH = Path("build")
 
 
 def clean_dist():
-  dist = get_dist()
-
-  for f in dist.iterdir():
-    if f.is_dir():
-      shutil.rmtree(f.absolute())
-    else:
-      pathlib.os.remove(f.absolute())
+    for f in BUILD_PATH.iterdir():
+        if f.is_dir():
+            shutil.rmtree(f.absolute())
+        else:
+            os.remove(f.absolute())
 
 
 def copy_dist():
-  dist = get_dist()
-  reaper = get_reap()
-  for f in dist.iterdir():
-    print(f.absolute())
-    if f.is_dir():
-      shutil.copytree(f.absolute(), pathlib.Path(reaper, f.name))
-    else:
-      shutil.copy(f.absolute(), reaper.absolute())
+    for f in BUILD_PATH.iterdir():
+        print(f.absolute())
+        if f.is_dir():
+            shutil.copytree(f.absolute(), Path(REAPER_ROOT, f.name))
+        else:
+            shutil.copy(f.absolute(), REAPER_ROOT.absolute())
 
-  pathlib.Path(reaper, "index.html").rename(pathlib.Path(reaper,"cue_mix.html"))
-  shutil.copytree("src/data", pathlib.Path(reaper, "data"))
-  shutil.copytree("src/images", pathlib.Path(reaper, "images"))
+    Path(REAPER_ROOT, "index.html").rename(Path(REAPER_ROOT, "cue_mix.html"))
 
 
 def clean_reap():
-  reaper = get_reap()
-
-  for f in reaper.iterdir():
-    if f.is_dir():
-      shutil.rmtree(f.absolute())
-    else:
-      pathlib.os.remove(f.absolute())
+    for f in REAPER_ROOT.iterdir():
+        if f.is_dir():
+            shutil.rmtree(f.absolute())
+        else:
+            os.remove(f.absolute())
 
 
 def build():
-  run("yarn build", shell=True, check=True)
+    run("yarn build", shell=True, check=True)
 
 
-try:
-  clean_dist()
-  clean_reap()
-except:
-  pass
+if __name__ == "__main__":
+    try:
+        clean_dist()
+        clean_reap()
+    except:
+        pass
 
-build()
-copy_dist()
-
+    build()
+    copy_dist()
