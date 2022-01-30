@@ -19,13 +19,13 @@ def is_windows():
 
 def get_reaper_root():
     if os.getenv("REAPER_ROOT"):
-        return Path(os.getenv("REAPER_ROOT"))
+        return Path(os.getenv("REAPER_ROOT"), "reaper_www_root")
     if is_apple():
-        return Path('~/Library/Application Support/REAPER').expanduser()
+        return Path('~/Library/Application Support/REAPER', "reaper_www_root").expanduser()
     elif is_windows():
-        return Path(os.path.expandvars(r'$APPDATA\REAPER'))
+        return Path(os.path.expandvars(r'$APPDATA\REAPER'), "reaper_www_root")
     else:
-        return Path('~/.config/REAPER').expanduser()
+        return Path('~/.config/REAPER', "reaper_www_root").expanduser()
 
 
 REAPER_ROOT = get_reaper_root()
