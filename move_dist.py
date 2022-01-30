@@ -2,9 +2,33 @@ import os
 import shutil
 from pathlib import Path
 from subprocess import run
+import sys
 
-REAPER_ROOT = Path(os.getenv("REAPER_ROOT", "~/.config/REAPER/reaper_www_root"))
 BUILD_PATH = Path("build")
+
+
+def is_apple():
+    """Return whether OS is MacOS or OSX."""
+    return sys.platform == "darwin"
+
+
+def is_windows():
+    """Return whether OS is Windows."""
+    return os.name == "nt"
+
+
+def get_reaper_root():
+    if os.getenv("REAPER_ROOT"):
+        return Path(os.getenv("REAPER_ROOT"))
+    if is_apple():
+        return Path('~/Library/Application Support/REAPER').expanduser()
+    elif is_windows():
+        return Path(os.path.expandvars(r'$APPDATA\REAPER'))
+    else:
+        return Path('~/.config/REAPER').expanduser()
+
+
+REAPER_ROOT = get_reaper_root()
 
 
 def clean_dist():
