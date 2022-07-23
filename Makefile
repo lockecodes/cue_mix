@@ -5,8 +5,10 @@ UNAME = $(shell uname -s)
 #ifeq ($(UNAME),Linux)
 #	REAPER_ROOT = ${LINUX_REAPER_ROOT}
 #endif
+deps-install:
+	brew install yarn node
 
-yarn-install:
+yarn-install: deps-install
 	yarn install
 
 deploy:

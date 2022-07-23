@@ -64,6 +64,11 @@ def build():
 
 if __name__ == "__main__":
     try:
+        REAPER_ROOT.mkdir(exist_ok=True)
+    except FileExistsError:
+        os.remove(REAPER_ROOT.absolute())
+        REAPER_ROOT.mkdir(exist_ok=True)
+    try:
         clean_dist()
         clean_reap()
     except:
