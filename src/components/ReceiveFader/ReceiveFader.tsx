@@ -74,6 +74,8 @@ export default function ReceiveFader(props: { track: Track; receive: Send }) {
           value={volume}
           onChange={handleChange}
           onMouseUp={handleMouseUp}
+          onTouchMove={handleChange}
+          onTouchEnd={handleMouseUp}
           data-trackname={trackName}
           data-volume={volStr}
           style={cssProperties}

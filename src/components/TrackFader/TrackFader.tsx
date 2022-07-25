@@ -50,6 +50,8 @@ export default function TrackFader(props: { volume: number; trackNumber: number 
         value={volume}
         onChange={handleChange}
         onMouseUp={handleMouseUp}
+        onTouchMove={handleChange}
+        onTouchEnd={handleMouseUp}
         list="tickmarks"
       />
     </div>
