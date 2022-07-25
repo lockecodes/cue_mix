@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import ReaperApiService from '../../services/ReaperApi'
 import './TrackFader.css'
 
@@ -10,19 +10,28 @@ export default function TrackFader(props: { volume: number; trackNumber: number 
     return Math.min(value, decimalMax)
   }
 
-  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
-    const value = Math.min(parseFloat(e.currentTarget?.value), decimalMax)
-    setVolume(value)
+  const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = transformVolume(parseFloat(e.currentTarget?.value))
+    syncState(value)
+  }
+
+  const handleMouseUp = (e: React.FormEvent<HTMLInputElement>) => {
+    const value = transformVolume(parseFloat(e.currentTarget?.value))
     ReaperApiService.get(
       `/_/SET/TRACK/${props.trackNumber}/SEND/0/VOL/${transformVolume(value).toString()}`
     )
   }
+  const syncState = useCallback(
+    (value: number) => {
+      return setVolume(transformVolume(value))
+    },
+    []
+  )
 
   useEffect(() => {
-    if (volume !== transformVolume(props.volume)) {
-      setVolume(transformVolume(props.volume))
-    }
-  }, [volume, props.volume])
+    syncState(props.volume)
+  }, [])
+
   return (
     <div className="trackSlideContainer">
       <datalist id="tickmarks">
@@ -39,7 +48,8 @@ export default function TrackFader(props: { volume: number; trackNumber: number 
         max="3.99"
         step="0.01"
         value={volume}
-        onChange={onChange}
+        onChange={handleChange}
+        onMouseUp={handleMouseUp}
         list="tickmarks"
       />
     </div>

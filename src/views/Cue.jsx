@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import ReaperApiService from '../services/ReaperApi'
 import TrackFader from '../components/TrackFader/TrackFader'
 import ReceiveFader from '../components/ReceiveFader/ReceiveFader'
-import useInterval from '../services/UseInterval'
 import './Cue.css'
 
 export default function Cue() {
@@ -14,10 +13,6 @@ export default function Cue() {
   const [receiveElems, setReceiveElems] = useState()
   const [hidePresetLink, setHidePresetLink] = useState(true)
   const [preset, setPreset] = useState()
-
-  useInterval(() => {
-    getCueContent().then()
-  }, 1000)
 
   const getCueContent = () => {
     let url = `/_/TRACK;NTRACK;GET/TRACK/${
@@ -51,6 +46,10 @@ export default function Cue() {
       navigate('/')
     }
   }, [navigate, track.trackName])
+
+  useEffect(() => {
+    getCueContent().then()
+  }, [])
 
   return (
     <>
