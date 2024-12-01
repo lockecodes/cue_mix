@@ -1,0 +1,3 @@
+[submodule "reaper_scripting"]
+	path = reaper_scripting
+	url = git@gitlab.com:locke-codes/reaper_scripting.git
