@@ -31,3 +31,8 @@ NOTE: This works on linux and I have not tested on mac just yet.
 Upon coming back to this project to get the docker stuff working and some docs, it appears that now this does not
 work due to Content Security Policies around `eval-unsafe`.
 I'm still investigating this for now unfortunately.
+
+## Integration with reaper_scripting
+This was created alongside this repository https://gitlab.com/locke-codes/reaper_scripting/-/tree/main?ref_type=heads
+which allows changing presets for your virtual instrument through the same interface.
+I have not yet worked on getting that integration working here yet.
