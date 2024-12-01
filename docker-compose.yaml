@@ -1,0 +1,23 @@
+services:
+  reaper:
+    image: reaper
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - USER_ID=${USER_ID}
+    user: "${USER_ID}:audio"
+    environment:
+      - DISPLAY=${DISPLAY}
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - DESKTOP_SESSION=/usr/share/wayland-sessions/plasmawayland
+      - XDG_SESSION_TYPE=wayland
+      - PIPEWIRE_RUNTIME_DIR=/tmp
+      - USER_ID=${USER_ID}
+    volumes:
+      - ${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}:/tmp/${WAYLAND_DISPLAY}
+      - /run/user/${USER_ID}/pipewire-0:/tmp/pipewire-0
+    devices:
+      - /dev/snd
+    network_mode: host
