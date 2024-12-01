@@ -6,22 +6,31 @@ import Cue from './views/Cue'
 import styled from 'styled-components'
 import './App.css'
 import PresetView from './views/PresetView'
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 export default function App() {
   return (
-    <StoreProvider>
-      <ViewWrapper>
-        <HashRouter>
-          <Routes>
-            <Route path="/" element={<MainView />} />
-            <Route path="cue" element={<Cue />}>
-              <Route path=":trackNumber" element={<Cue />}/>
-            </Route>
-            <Route path="presets" element={<PresetView />}/>
-          </Routes>
-        </HashRouter>
-      </ViewWrapper>
-    </StoreProvider>
+    <HelmetProvider>
+        <Helmet>
+            <meta
+                httpEquiv="Content-Security-Policy"
+                content="script-src 'unsafe-eval';"
+            ></meta>
+        </Helmet>
+        <StoreProvider>
+            <ViewWrapper>
+                <HashRouter>
+                    <Routes>
+                        <Route path="/" element={<MainView/>}/>
+                        <Route path="cue" element={<Cue/>}>
+                            <Route path=":trackNumber" element={<Cue/>}/>
+                        </Route>
+                        <Route path="presets" element={<PresetView />}/>
+            </Routes>
+          </HashRouter>
+        </ViewWrapper>
+      </StoreProvider>
+    </HelmetProvider>
   )
 }
 

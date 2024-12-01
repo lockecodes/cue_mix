@@ -18,12 +18,13 @@ USER_ID := $(shell id -u)
 deps-install:
 	brew install yarn node
 
-.PHONY: yarn-install
-yarn-install:
-	yarn install
+.PHONY: build-local
+build-local:
+	yarn install \
+	&& yarn build
 
-.PHONY: deploy
-deploy:
+.PHONY: deploy-local
+deploy-local: build-local
 	python3 move_dist.py
 
 .PHONY: env
