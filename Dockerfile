@@ -30,15 +30,18 @@ RUN useradd \
 WORKDIR /home/cue
 
 RUN zypper install -y \
-    git \
     alsa \
     alsa-firmware \
     alsa-ucm-conf \
     alsa-utils \
+    gcc \
+    git \
+    libasound2 \
     libgtk-3-0 \
+    libpipewire-0_3-0 \
     libsndfile1 \
     libstdc++6 \
-    libasound2 \
+    make \
     Mesa-libGL-devel \
     pipewire \
     pipewire-alsa \
@@ -47,22 +50,23 @@ RUN zypper install -y \
     pipewire-pulseaudio \
     pipewire-spa-plugins-0_2 \
     pipewire-spa-tools \
-    pipewire-spa-tools \
-    libpipewire-0_3-0 \
-    wget \
+    python311 \
+    python311-pip \
     tar \
+    wget \
     xz
 
 RUN wget --no-check-certificate https://www.reaper.fm/files/7.x/reaper727_linux_x86_64.tar.xz \
     && tar -xvf reaper727_linux_x86_64.tar.xz --directory /opt \
     && rm reaper727_linux_x86_64.tar.xz \
-    && chown cue:audio /opt/reaper_linux_x86_64 \
+    && chown -R cue:audio /opt/reaper_linux_x86_64 \
     && /opt/reaper_linux_x86_64/install-reaper.sh --usr-local-bin-symlink
 
 USER cue
 
 COPY --chown=cue project /home/cue/project/
 COPY --from=react_base --chown=cue /app/build /opt/reaper_linux_x86_64/REAPER/Plugins/reaper_www_root
-RUN mv /opt/reaper_linux_x86_64/REAPER/Plugins/reaper_www_root/index.html /opt/reaper_linux_x86_64/REAPER/Plugins/reaper_www_root/cue_mix.html
+RUN mv /opt/reaper_linux_x86_64/REAPER/Plugins/reaper_www_root/index.html \
+      /opt/reaper_linux_x86_64/REAPER/Plugins/reaper_www_root/cue_mix.html
 
-CMD ["reaper", "-cfgfile", "/home/cue/project/reaper.ini", "/home/cue/project/test.rpp"]
+CMD ["bash", "-c"]

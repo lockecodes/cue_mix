@@ -43,10 +43,21 @@ build:
 xhost-shim:
 	xhost +
 
-.PHONY: run
-run: xhost-shim
+.PHONY: up
+up: xhost-shim
 	DISPLAY=$(DISPLAY) \
 	  XDG_RUNTIME_DIR=$(XDG_RUNTIME_DIR) \
       WAYLAND_DISPLAY=$(WAYLAND_DISPLAY) \
       USER_ID=$(USER_ID) \
-	  $(DOCKER) compose up
+	  $(DOCKER) compose up -d
+
+.PHONY: down
+down:
+	$(DOCKER) compose down --remove-orphans
+
+.PHONY: run
+run: up
+	#cat reaper_scripting/docs/setup.md
+	$(DOCKER) compose \
+		exec $(CONTAINER_NAME) \
+		bash -c "/opt/reaper_linux_x86_64/REAPER/reaper -cfgfile /home/cue/project/reaper.ini /home/cue/project/test.rpp"
